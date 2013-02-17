@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Author: François Ingelrest
 
@@ -124,8 +125,22 @@ def mp3walk(directory):
         print 'W No MP3 files found in "%s"' % directory
     else:
         if len(pics) == 0:
-            print 'W No cover found in "%s"' % directory
-            copycover(mp3s)
+            print 'W No cover found in "%s", looking in the parent directory...' % directory
+
+            parent = os.path.join(directory, '..')
+
+            for child in [os.path.join(parent, child) for child in os.listdir(parent)]:
+                if os.path.isfile(child) and os.path.splitext(child.lower())[1] in ('.jpg', '.jpeg'):
+                    pics.append(child)
+                    break
+
+            if len(pics) == 0:
+                print 'W No cover found...'
+                copycover(mp3s)
+            else:
+                print '  Using image "%s"' % os.path.basename(pics[0])
+                copycover(mp3s, pics[0])
+
         else:
             print '  Using image "%s"' % os.path.basename(pics[0])
             copycover(mp3s, pics[0])
